@@ -1,0 +1,346 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		000DE6D61416BA0F006B478D /* testimage.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 000DE6D51416BA0F006B478D /* testimage.jpg */; };
+		0013FA2514111D0E004DC957 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0013FA2414111D0E004DC957 /* UIKit.framework */; };
+		0013FA2714111D0E004DC957 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0013FA2614111D0E004DC957 /* Foundation.framework */; };
+		0013FA2914111D0E004DC957 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0013FA2814111D0E004DC957 /* CoreGraphics.framework */; };
+		0013FA2F14111D0F004DC957 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0013FA2D14111D0F004DC957 /* InfoPlist.strings */; };
+		0013FA3114111D0F004DC957 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 0013FA3014111D0F004DC957 /* main.m */; };
+		0013FA3514111D0F004DC957 /* OpenCVClientAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0013FA3414111D0F004DC957 /* OpenCVClientAppDelegate.mm */; };
+		0013FA3814111D0F004DC957 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0013FA3614111D0F004DC957 /* MainWindow.xib */; };
+		0013FA3B14111D0F004DC957 /* OpenCVClientViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0013FA3A14111D0F004DC957 /* OpenCVClientViewController.mm */; };
+		0013FA3E14111D0F004DC957 /* OpenCVClientViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0013FA3C14111D0F004DC957 /* OpenCVClientViewController.xib */; };
+		0013FA4814111D6A004DC957 /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0013FA4714111D6A004DC957 /* UIImage+OpenCV.mm */; };
+		005C83F41411413800B1ADDB /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 005C83F31411413700B1ADDB /* libz.dylib */; };
+		005C83F61411414700B1ADDB /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 005C83F51411414700B1ADDB /* ImageIO.framework */; };
+		005C8458141697CC00B1ADDB /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 005C8457141697CC00B1ADDB /* AVFoundation.framework */; };
+		005C845A141697EF00B1ADDB /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 005C8459141697EF00B1ADDB /* CoreVideo.framework */; };
+		005C845C1416980700B1ADDB /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 005C845B1416980700B1ADDB /* CoreMedia.framework */; };
+		005C85B71416B09D00B1ADDB /* OpenCV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 005C85B61416B09D00B1ADDB /* OpenCV.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		000DE6D51416BA0F006B478D /* testimage.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = testimage.jpg; path = OpenCVClient/testimage.jpg; sourceTree = "<group>"; };
+		0013FA2014111D0E004DC957 /* OpenCVClient.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenCVClient.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0013FA2414111D0E004DC957 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		0013FA2614111D0E004DC957 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		0013FA2814111D0E004DC957 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		0013FA2C14111D0F004DC957 /* OpenCVClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "OpenCVClient-Info.plist"; sourceTree = "<group>"; };
+		0013FA2E14111D0F004DC957 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0013FA3014111D0F004DC957 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		0013FA3214111D0F004DC957 /* OpenCVClient-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OpenCVClient-Prefix.pch"; sourceTree = "<group>"; };
+		0013FA3314111D0F004DC957 /* OpenCVClientAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenCVClientAppDelegate.h; sourceTree = "<group>"; };
+		0013FA3414111D0F004DC957 /* OpenCVClientAppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCVClientAppDelegate.mm; sourceTree = "<group>"; };
+		0013FA3714111D0F004DC957 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		0013FA3914111D0F004DC957 /* OpenCVClientViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenCVClientViewController.h; sourceTree = "<group>"; };
+		0013FA3A14111D0F004DC957 /* OpenCVClientViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCVClientViewController.mm; sourceTree = "<group>"; };
+		0013FA3D14111D0F004DC957 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/OpenCVClientViewController.xib; sourceTree = "<group>"; };
+		0013FA4614111D6A004DC957 /* UIImage+OpenCV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+OpenCV.h"; sourceTree = "<group>"; };
+		0013FA4714111D6A004DC957 /* UIImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+OpenCV.mm"; sourceTree = "<group>"; };
+		005C83F31411413700B1ADDB /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		005C83F51411414700B1ADDB /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		005C8457141697CC00B1ADDB /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		005C8459141697EF00B1ADDB /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		005C845B1416980700B1ADDB /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		005C85B61416B09D00B1ADDB /* OpenCV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OpenCV.framework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0013FA1D14111D0E004DC957 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				005C845C1416980700B1ADDB /* CoreMedia.framework in Frameworks */,
+				005C845A141697EF00B1ADDB /* CoreVideo.framework in Frameworks */,
+				005C8458141697CC00B1ADDB /* AVFoundation.framework in Frameworks */,
+				005C83F61411414700B1ADDB /* ImageIO.framework in Frameworks */,
+				005C83F41411413800B1ADDB /* libz.dylib in Frameworks */,
+				0013FA2514111D0E004DC957 /* UIKit.framework in Frameworks */,
+				0013FA2714111D0E004DC957 /* Foundation.framework in Frameworks */,
+				0013FA2914111D0E004DC957 /* CoreGraphics.framework in Frameworks */,
+				005C85B71416B09D00B1ADDB /* OpenCV.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0013FA1514111D0E004DC957 = {
+			isa = PBXGroup;
+			children = (
+				0013FA4D14112999004DC957 /* Images */,
+				0013FA2A14111D0F004DC957 /* OpenCVClient */,
+				0013FA2314111D0E004DC957 /* Frameworks */,
+				0013FA2114111D0E004DC957 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0013FA2114111D0E004DC957 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0013FA2014111D0E004DC957 /* OpenCVClient.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0013FA2314111D0E004DC957 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				005C85B61416B09D00B1ADDB /* OpenCV.framework */,
+				005C8459141697EF00B1ADDB /* CoreVideo.framework */,
+				005C845B1416980700B1ADDB /* CoreMedia.framework */,
+				005C83F31411413700B1ADDB /* libz.dylib */,
+				005C8457141697CC00B1ADDB /* AVFoundation.framework */,
+				005C83F51411414700B1ADDB /* ImageIO.framework */,
+				0013FA2414111D0E004DC957 /* UIKit.framework */,
+				0013FA2614111D0E004DC957 /* Foundation.framework */,
+				0013FA2814111D0E004DC957 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		0013FA2A14111D0F004DC957 /* OpenCVClient */ = {
+			isa = PBXGroup;
+			children = (
+				0013FA3314111D0F004DC957 /* OpenCVClientAppDelegate.h */,
+				0013FA3414111D0F004DC957 /* OpenCVClientAppDelegate.mm */,
+				0013FA3614111D0F004DC957 /* MainWindow.xib */,
+				0013FA3914111D0F004DC957 /* OpenCVClientViewController.h */,
+				0013FA3A14111D0F004DC957 /* OpenCVClientViewController.mm */,
+				0013FA3C14111D0F004DC957 /* OpenCVClientViewController.xib */,
+				0013FA2B14111D0F004DC957 /* Supporting Files */,
+				0013FA4614111D6A004DC957 /* UIImage+OpenCV.h */,
+				0013FA4714111D6A004DC957 /* UIImage+OpenCV.mm */,
+			);
+			path = OpenCVClient;
+			sourceTree = "<group>";
+		};
+		0013FA2B14111D0F004DC957 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				0013FA2C14111D0F004DC957 /* OpenCVClient-Info.plist */,
+				0013FA2D14111D0F004DC957 /* InfoPlist.strings */,
+				0013FA3014111D0F004DC957 /* main.m */,
+				0013FA3214111D0F004DC957 /* OpenCVClient-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		0013FA4D14112999004DC957 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				000DE6D51416BA0F006B478D /* testimage.jpg */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0013FA1F14111D0E004DC957 /* OpenCVClient */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0013FA4114111D0F004DC957 /* Build configuration list for PBXNativeTarget "OpenCVClient" */;
+			buildPhases = (
+				0013FA1C14111D0E004DC957 /* Sources */,
+				0013FA1D14111D0E004DC957 /* Frameworks */,
+				0013FA1E14111D0E004DC957 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenCVClient;
+			productName = OpenCVClient;
+			productReference = 0013FA2014111D0E004DC957 /* OpenCVClient.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0013FA1714111D0E004DC957 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "Aptogo Limited";
+			};
+			buildConfigurationList = 0013FA1A14111D0E004DC957 /* Build configuration list for PBXProject "OpenCVClient" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 0013FA1514111D0E004DC957;
+			productRefGroup = 0013FA2114111D0E004DC957 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0013FA1F14111D0E004DC957 /* OpenCVClient */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0013FA1E14111D0E004DC957 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0013FA2F14111D0F004DC957 /* InfoPlist.strings in Resources */,
+				0013FA3814111D0F004DC957 /* MainWindow.xib in Resources */,
+				0013FA3E14111D0F004DC957 /* OpenCVClientViewController.xib in Resources */,
+				000DE6D61416BA0F006B478D /* testimage.jpg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0013FA1C14111D0E004DC957 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0013FA3114111D0F004DC957 /* main.m in Sources */,
+				0013FA3514111D0F004DC957 /* OpenCVClientAppDelegate.mm in Sources */,
+				0013FA3B14111D0F004DC957 /* OpenCVClientViewController.mm in Sources */,
+				0013FA4814111D6A004DC957 /* UIImage+OpenCV.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		0013FA2D14111D0F004DC957 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0013FA2E14111D0F004DC957 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		0013FA3614111D0F004DC957 /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0013FA3714111D0F004DC957 /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		0013FA3C14111D0F004DC957 /* OpenCVClientViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0013FA3D14111D0F004DC957 /* en */,
+			);
+			name = OpenCVClientViewController.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		0013FA3F14111D0F004DC957 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		0013FA4014111D0F004DC957 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		0013FA4214111D0F004DC957 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "OpenCVClient/OpenCVClient-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
+				INFOPLIST_FILE = "OpenCVClient/OpenCVClient-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		0013FA4314111D0F004DC957 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "OpenCVClient/OpenCVClient-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
+				INFOPLIST_FILE = "OpenCVClient/OpenCVClient-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0013FA1A14111D0E004DC957 /* Build configuration list for PBXProject "OpenCVClient" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0013FA3F14111D0F004DC957 /* Debug */,
+				0013FA4014111D0F004DC957 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0013FA4114111D0F004DC957 /* Build configuration list for PBXNativeTarget "OpenCVClient" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0013FA4214111D0F004DC957 /* Debug */,
+				0013FA4314111D0F004DC957 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0013FA1714111D0E004DC957 /* Project object */;
+}
