@@ -5,16 +5,28 @@
 //  Created by Robin Summerhill on 02/09/2011.
 //  Copyright 2011 Aptogo Limited. All rights reserved.
 //
+
+// UIImage extensions for converting between UIImage and cv::Mat
 #import "UIImage+OpenCV.h"
 
 #import "OpenCVClientViewController.h"
 
+// Aperture value to use for the Canny edge detection
+const int kCannyAperture = 7;
+
+@interface OpenCVClientViewController ()
+- (void)processFrame;
+@end
+
 @implementation OpenCVClientViewController
 
 @synthesize imageView = _imageView;
-@synthesize label = _label;
+@synthesize elapsedTimeLabel = _elapsedTimeLabel;
+@synthesize highSlider = _highSlider;
+@synthesize lowSlider= _lowSlider;
+@synthesize highLabel = _highLabel;
+@synthesize lowLabel = _lowLabel;
 
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -86,15 +98,20 @@
     
     NSLog(@"cv::Mat to UIImage: %gms", t);
     
-    // Display the test image
-    self.imageView.image = [UIImage imageWithCVMat:testMat];
+    // Process test image and force update of UI 
+    _lastFrame = testMat;
+    [self sliderChanged:nil];
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
     self.imageView = nil;
-    self.label = nil;
+    self.elapsedTimeLabel = nil;
+    self.highLabel = nil;
+    self.lowLabel = nil;
+    self.highSlider = nil;
+    self.lowSlider = nil;
 
     delete _videoCapture;
     _videoCapture = nil;
@@ -106,26 +123,50 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+// Called when the user taps the Capture button. Grab a frame and process it
 - (IBAction)capture:(id)sender
 {
     if (_videoCapture && _videoCapture->grab())
     {
-        double t = (double)cv::getTickCount();
-        
-        cv::Mat frame, processedFrame;
-        (*_videoCapture) >> frame;
-        cv::cvtColor(frame, processedFrame, cv::COLOR_RGB2GRAY);
-        cv::Canny(processedFrame, processedFrame, 100, 500);
-        
-        t = 1000 * ((double)cv::getTickCount() - t) / cv::getTickFrequency();
-        
-        self.imageView.image = [UIImage imageWithCVMat:processedFrame];
-        self.label.text = [NSString stringWithFormat:@"%.1fms", t];
+        (*_videoCapture) >> _lastFrame;
+        [self processFrame];
     }
     else
     {
         NSLog(@"Failed to grab frame");        
     }
+}
+
+// Perform image processing on the last captured frame and display the results
+- (void)processFrame
+{
+    double t = (double)cv::getTickCount();
+    
+    cv::Mat grayFrame, output;
+  
+    // Convert captured frame to grayscale
+    cv::cvtColor(_lastFrame, grayFrame, cv::COLOR_RGB2GRAY);
+    
+    // Perform Canny edge detection using slide values for thresholds
+    cv::Canny(grayFrame, output,
+              _lowSlider.value * kCannyAperture * kCannyAperture,
+              _highSlider.value * kCannyAperture * kCannyAperture,
+              kCannyAperture);
+    
+    t = 1000 * ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+    
+    // Display result 
+    self.imageView.image = [UIImage imageWithCVMat:output];
+    self.elapsedTimeLabel.text = [NSString stringWithFormat:@"%.1fms", t];
+}
+
+// Called when the user changes either of the threshold sliders
+- (IBAction)sliderChanged:(id)sender
+{
+    self.highLabel.text = [NSString stringWithFormat:@"%.0f", self.highSlider.value];
+    self.lowLabel.text = [NSString stringWithFormat:@"%.0f", self.lowSlider.value];
+    
+    [self processFrame];
 }
 
 @end

@@ -11,12 +11,17 @@
 @interface OpenCVClientViewController : UIViewController
 {
     cv::VideoCapture *_videoCapture;
+    cv::Mat _lastFrame;
 }
 
 @property (nonatomic, retain) IBOutlet UIImageView *imageView;
-@property (nonatomic, retain) IBOutlet UILabel *label;
-
+@property (nonatomic, retain) IBOutlet UILabel *elapsedTimeLabel;
+@property (nonatomic, retain) IBOutlet UISlider *highSlider;
+@property (nonatomic, retain) IBOutlet UISlider *lowSlider;
+@property (nonatomic, retain) IBOutlet UILabel *highLabel;
+@property (nonatomic, retain) IBOutlet UILabel *lowLabel;
 
 - (IBAction)capture:(id)sender;
+- (IBAction)sliderChanged:(id)sender;
 
 @end
