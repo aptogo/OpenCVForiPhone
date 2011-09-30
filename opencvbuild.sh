@@ -63,11 +63,11 @@ echo "Build directory   :" $BUILD_DIR
 
 ################################################################################
 # Clean previous build
-#rm -rf "$TEMP_BUILD_DIR"
-#rm -rf "$IPHONE_SIMULATOR_INSTALL_DIR"
-#rm -rf "$IPHONE_OS_INSTALL_DIR"
-#rm -rf "$UNIVERSAL_INSTALL_DIR"
-#rm -rf "$FRAMEWORK_DIR"
+rm -rf "$TEMP_BUILD_DIR"
+rm -rf "$IPHONE_SIMULATOR_INSTALL_DIR"
+rm -rf "$IPHONE_OS_INSTALL_DIR"
+rm -rf "$UNIVERSAL_INSTALL_DIR"
+rm -rf "$FRAMEWORK_DIR"
 
 mkdir -p "$BUILD_DIR"
 mkdir -p "$TEMP_BUILD_DIR"
