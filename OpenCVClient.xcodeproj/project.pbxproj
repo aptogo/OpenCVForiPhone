@@ -50,6 +50,7 @@
 		005C8459141697EF00B1ADDB /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		005C845B1416980700B1ADDB /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		005C85B61416B09D00B1ADDB /* OpenCV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OpenCV.framework; sourceTree = "<group>"; };
+		00FDD98E1435E549008F8ECE /* README.markdown */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.markdown; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,11 +62,11 @@
 				005C845A141697EF00B1ADDB /* CoreVideo.framework in Frameworks */,
 				005C8458141697CC00B1ADDB /* AVFoundation.framework in Frameworks */,
 				005C83F61411414700B1ADDB /* ImageIO.framework in Frameworks */,
-				005C83F41411413800B1ADDB /* libz.dylib in Frameworks */,
 				0013FA2514111D0E004DC957 /* UIKit.framework in Frameworks */,
 				0013FA2714111D0E004DC957 /* Foundation.framework in Frameworks */,
 				0013FA2914111D0E004DC957 /* CoreGraphics.framework in Frameworks */,
 				005C85B71416B09D00B1ADDB /* OpenCV.framework in Frameworks */,
+				005C83F41411413800B1ADDB /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +76,7 @@
 		0013FA1514111D0E004DC957 = {
 			isa = PBXGroup;
 			children = (
+				00FDD98E1435E549008F8ECE /* README.markdown */,
 				0013FA4D14112999004DC957 /* Images */,
 				0013FA2A14111D0F004DC957 /* OpenCVClient */,
 				0013FA2314111D0E004DC957 /* Frameworks */,
@@ -96,12 +98,12 @@
 				005C85B61416B09D00B1ADDB /* OpenCV.framework */,
 				005C8459141697EF00B1ADDB /* CoreVideo.framework */,
 				005C845B1416980700B1ADDB /* CoreMedia.framework */,
-				005C83F31411413700B1ADDB /* libz.dylib */,
 				005C8457141697CC00B1ADDB /* AVFoundation.framework */,
 				005C83F51411414700B1ADDB /* ImageIO.framework */,
 				0013FA2414111D0E004DC957 /* UIKit.framework */,
 				0013FA2614111D0E004DC957 /* Foundation.framework */,
 				0013FA2814111D0E004DC957 /* CoreGraphics.framework */,
+				005C83F31411413700B1ADDB /* libz.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
