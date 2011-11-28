@@ -114,16 +114,46 @@ class CV_EXPORTS Retina {
 
 public:
 
+	// parameters structure for better clarity, check explenations on the comments of methods : setupOPLandIPLParvoChannel and setupIPLMagnoChannel
+        struct RetinaParameters{ 
+	    struct OPLandIplParvoParameters{ // Outer Plexiform Layer (OPL) and Inner Plexiform Layer Parvocellular (IplParvo) parameters 
+               OPLandIplParvoParameters():colorMode(true),
+                                 normaliseOutput(true),
+                                 photoreceptorsLocalAdaptationSensitivity(0.7f),
+                                 photoreceptorsTemporalConstant(0.5f),
+                                 photoreceptorsSpatialConstant(0.53f),
+                                 horizontalCellsGain(0.0f),
+                                 hcellsTemporalConstant(1.f),
+                                 hcellsSpatialConstant(7.f),
+                                 ganglionCellsSensitivity(0.7f){};// default setup
+               bool colorMode, normaliseOutput;
+               float photoreceptorsLocalAdaptationSensitivity, photoreceptorsTemporalConstant, photoreceptorsSpatialConstant, horizontalCellsGain, hcellsTemporalConstant, hcellsSpatialConstant, ganglionCellsSensitivity;
+           };
+           struct IplMagnoParameters{ // Inner Plexiform Layer Magnocellular channel (IplMagno)
+               IplMagnoParameters():
+                          normaliseOutput(true),
+                          parasolCells_beta(0.f),
+                          parasolCells_tau(0.f),
+                          parasolCells_k(7.f),
+                          amacrinCellsTemporalCutFrequency(1.2f),
+                          V0CompressionParameter(0.95f),
+                          localAdaptintegration_tau(0.f),
+                          localAdaptintegration_k(7.f){};// default setup
+               bool normaliseOutput;
+               float parasolCells_beta, parasolCells_tau, parasolCells_k, amacrinCellsTemporalCutFrequency, V0CompressionParameter, localAdaptintegration_tau, localAdaptintegration_k;
+           };
+            struct OPLandIplParvoParameters OPLandIplParvo;
+            struct IplMagnoParameters IplMagno;
+	};
+
 	/**
 	 * Main constructor with most commun use setup : create an instance of color ready retina model
-	 * @param parametersSaveFile : the filename of the xml file that records the used retina parametes setup
 	 * @param inputSize : the input frame size
 	 */
-	Retina(const std::string parametersSaveFile, Size inputSize);
+	Retina(Size inputSize);
 
 	/**
 	 * Complete Retina filter constructor which allows all basic structural parameters definition
-	 * @param parametersSaveFile : the filename of the xml file that records the used retina parametes setup
          * @param inputSize : the input frame size
 	 * @param colorMode : the chosen processing mode : with or without color processing
 	 * @param colorSamplingMethod: specifies which kind of color sampling will be used
@@ -131,7 +161,7 @@ public:
 	 * @param reductionFactor: only usefull if param useRetinaLogSampling=true, specifies the reduction factor of the output frame (as the center (fovea) is high resolution and corners can be underscaled, then a reduction of the output is allowed without precision leak
 	 * @param samplingStrenght: only usefull if param useRetinaLogSampling=true, specifies the strenght of the log scale that is applied
 	 */
-	Retina(const std::string parametersSaveFile, Size inputSize, const bool colorMode, RETINA_COLORSAMPLINGMETHOD colorSamplingMethod=RETINA_COLOR_BAYER, const bool useRetinaLogSampling=false, const double reductionFactor=1.0, const double samplingStrenght=10.0);
+	Retina(Size inputSize, const bool colorMode, RETINA_COLORSAMPLINGMETHOD colorSamplingMethod=RETINA_COLOR_BAYER, const bool useRetinaLogSampling=false, const double reductionFactor=1.0, const double samplingStrenght=10.0);
 
 	virtual ~Retina();
 
@@ -144,11 +174,48 @@ public:
 	 */
 	void setup(std::string retinaParameterFile="", const bool applyDefaultSetupOnFailure=true);
 
+	
+	/**
+	 * try to open an XML retina parameters file to adjust current retina instance setup
+	 * => if the xml file does not exist, then default setup is applied
+	 * => warning, Exceptions are thrown if read XML file is not valid
+	 * @param fs : the open Filestorage which contains retina parameters
+         * @param applyDefaultSetupOnFailure : set to true if an error must be thrown on error
+	 */
+        void setup(cv::FileStorage &fs, const bool applyDefaultSetupOnFailure=true);
+
+	/**
+	 * try to open an XML retina parameters file to adjust current retina instance setup
+	 * => if the xml file does not exist, then default setup is applied
+	 * => warning, Exceptions are thrown if read XML file is not valid
+	 * @param newParameters : a parameters structures updated with the new target configuration
+         * @param applyDefaultSetupOnFailure : set to true if an error must be thrown on error
+	 */
+	void setup(RetinaParameters newParameters);
+
+        /**
+         * @return the current parameters setup
+         */
+        struct Retina::RetinaParameters getParameters();
+
 	/**
 	 * parameters setup display method
 	 * @return a string which contains formatted parameters information
 	 */
 	const std::string printSetup();
+
+	/**
+	 * write xml/yml formated parameters information
+	 * @rparam fs : the filename of the xml file that will be open and writen with formatted parameters information
+	 */
+	virtual void write( std::string fs ) const;
+
+
+	/**
+	 * write xml/yml formated parameters information
+	 * @param fs : a cv::Filestorage object ready to be filled
+         */
+	virtual void write( FileStorage& fs ) const;
 
 	/**
 	 * setup the OPL and IPL parvo channels (see biologocal model)
@@ -238,8 +305,7 @@ public:
 
 protected:
 	// Parameteres setup members
-	FileStorage _parametersSaveFile; //!< parameters file ... saved on instance delete
-	std::string _parametersSaveFileName; //!< parameters file name
+	RetinaParameters _retinaParameters; // structure of parameters
 	
         // Retina model related modules
 	std::valarray<float> _inputBuffer; //!< buffer used to convert input cv::Mat to internal retina buffers format (valarrays)
@@ -266,7 +332,7 @@ protected:
 	const bool _convertCvMat2ValarrayBuffer(const cv::Mat inputMatToConvert, std::valarray<float> &outputValarrayMatrix);
 
 	//! private method called by constructors, gathers their parameters and use them in a unified way
-	void _init(const std::string parametersSaveFile, Size inputSize, const bool colorMode, RETINA_COLORSAMPLINGMETHOD colorSamplingMethod=RETINA_COLOR_BAYER, const bool useRetinaLogSampling=false, const double reductionFactor=1.0, const double samplingStrenght=10.0);
+	void _init(const Size inputSize, const bool colorMode, RETINA_COLORSAMPLINGMETHOD colorSamplingMethod=RETINA_COLOR_BAYER, const bool useRetinaLogSampling=false, const double reductionFactor=1.0, const double samplingStrenght=10.0);
 
 
 };

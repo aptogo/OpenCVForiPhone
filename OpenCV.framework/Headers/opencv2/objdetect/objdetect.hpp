@@ -286,6 +286,45 @@ namespace cv
 	
 ///////////////////////////// Object Detection ////////////////////////////
 
+/*
+ * This is a class wrapping up the structure CvLatentSvmDetector and functions working with it.
+ * The class goals are:
+ * 1) provide c++ interface;
+ * 2) make it possible to load and detect more than one class (model) unlike CvLatentSvmDetector.
+ */
+class CV_EXPORTS LatentSvmDetector
+{
+public:
+    struct CV_EXPORTS ObjectDetection
+    {
+        ObjectDetection();
+        ObjectDetection( const Rect& rect, float score, int classID=-1 );
+        Rect rect;
+        float score;
+        int classID;
+    };
+
+    LatentSvmDetector();
+    LatentSvmDetector( const vector<string>& filenames, const vector<string>& classNames=vector<string>() );
+    virtual ~LatentSvmDetector();
+
+    virtual void clear();
+    virtual bool empty() const;
+    bool load( const vector<string>& filenames, const vector<string>& classNames=vector<string>() );
+
+    virtual void detect( const Mat& image,
+                         vector<ObjectDetection>& objectDetections,
+                         float overlapThreshold=0.5f,
+                         int numThreads=-1 );
+
+    const vector<string>& getClassNames() const;
+    size_t getClassCount() const;
+
+private:
+    vector<CvLatentSvmDetector*> detectors;
+    vector<string> classNames;
+};
+
 CV_EXPORTS void groupRectangles(CV_OUT CV_IN_OUT vector<Rect>& rectList, int groupThreshold, double eps=0.2);
 CV_EXPORTS_W void groupRectangles(CV_OUT CV_IN_OUT vector<Rect>& rectList, CV_OUT vector<int>& weights, int groupThreshold, double eps=0.2);
 CV_EXPORTS void groupRectangles( vector<Rect>& rectList, int groupThreshold, double eps, vector<int>* weights, vector<double>* levelWeights );
@@ -298,7 +337,7 @@ CV_EXPORTS void groupRectangles_meanshift(vector<Rect>& rectList, vector<double>
 class CV_EXPORTS FeatureEvaluator
 {
 public:    
-    enum { HAAR = 0, LBP = 1 };
+    enum { HAAR = 0, LBP = 1, HOG = 2 };
     virtual ~FeatureEvaluator();
 
     virtual bool read(const FileNode& node);
@@ -429,6 +468,21 @@ protected:
     Data data;
     Ptr<FeatureEvaluator> featureEvaluator;
     Ptr<CvHaarClassifierCascade> oldCascade;
+
+public:
+    class MaskGenerator
+    {
+        public:
+            virtual cv::Mat generateMask(const cv::Mat& src)=0;
+            virtual void initializeMask(const cv::Mat& /*src*/) {};
+    };
+    void setMaskGenerator(Ptr<MaskGenerator> maskGenerator);
+    Ptr<MaskGenerator> getMaskGenerator();
+
+    void setFaceDetectionMaskGenerator();
+
+protected:
+    Ptr<MaskGenerator> maskGenerator;
 };
 
     

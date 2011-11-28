@@ -119,7 +119,7 @@ CV_INLINE IppiSize ippiSize(int width, int height)
 #define CV_SSE3 0
 #endif
 
-#if defined ANDROID && defined __ARM_NEON__
+#if defined ANDROID && defined __ARM_NEON__ && defined __GNUC__
 #include "arm_neon.h"
 #define CV_NEON 1
 
@@ -200,7 +200,7 @@ CV_INLINE IppiSize ippiSize(int width, int height)
 
 
 #ifdef HAVE_THREADING_FRAMEWORK 
-#include "threading_framework.hpp"
+#include <OpenCV/opencv2/core/threading_framework.hpp>
 
         template<typename Body> 
         static void parallel_for( const BlockedRange& range, const Body& body )

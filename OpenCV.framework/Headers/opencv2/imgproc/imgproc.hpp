@@ -445,6 +445,9 @@ CV_EXPORTS_W void cornerHarris( InputArray src, OutputArray dst, int blockSize,
                                 int ksize, double k,
                                 int borderType=BORDER_DEFAULT );
 
+// low-level function for computing eigenvalues and eigenvectors of 2x2 matrices
+CV_EXPORTS void eigen2x2( const float* a, float* e, int n );
+    
 //! computes both eigenvalues and the eigenvectors of 2x2 derivative covariation matrix  at each pixel. The output is stored as 6-channel matrix.
 CV_EXPORTS_W void cornerEigenValsAndVecs( InputArray src, OutputArray dst,
                                           int blockSize, int ksize,
@@ -588,6 +591,9 @@ CV_EXPORTS_W void accumulateProduct( InputArray src1, InputArray src2,
 //! updates the running average (dst = dst*(1-alpha) + src*alpha)
 CV_EXPORTS_W void accumulateWeighted( InputArray src, InputOutputArray dst,
                                       double alpha, InputArray mask=noArray() );
+
+CV_EXPORTS_W Point2d phaseCorrelate(InputArray src1, InputArray src2, InputArray window = noArray());
+CV_EXPORTS_W void createHanningWindow(OutputArray dst, Size winSize, int type);
     
 //! type of the threshold operation
 enum { THRESH_BINARY=CV_THRESH_BINARY, THRESH_BINARY_INV=CV_THRESH_BINARY_INV,
@@ -1013,6 +1019,10 @@ CV_EXPORTS_W void convexHull( InputArray points, OutputArray hull,
 //! returns true iff the contour is convex. Does not support contours with self-intersection
 CV_EXPORTS_W bool isContourConvex( InputArray contour );
 
+//! finds intersection of two convex polygons
+CV_EXPORTS_W float intersectConvexConvex( InputArray _p1, InputArray _p2,
+                                          OutputArray _p12, bool handleNested=true );
+
 //! fits ellipse to the set of 2D points
 CV_EXPORTS_W RotatedRect fitEllipse( InputArray points );
 
@@ -1082,7 +1092,7 @@ protected:
     int isRightOf(Point2f pt, int edge) const;
     void calcVoronoi();
     void clearVoronoi();
-    void check() const;
+    void checkSubdiv() const;
     
     struct CV_EXPORTS Vertex
     {
@@ -1136,14 +1146,6 @@ struct CvLSHOperations
   virtual void hash_remove(lsh_hash h, int l, int i) = 0;
   virtual int hash_lookup(lsh_hash h, int l, int* ret_i, int ret_i_max) = 0;
 };
-
-namespace cv
-{
-
-CV_EXPORTS_W cv::Point2d phaseCorrelate(InputArray _src1, InputArray _src2, InputArray window = noArray());
-CV_EXPORTS_W void createHanningWindow(OutputArray _dst, cv::Size winSize, int type);
-
-}
 
 #endif /* __cplusplus */
 

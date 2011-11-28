@@ -422,16 +422,15 @@ public:
 
   struct CV_EXPORTS CommonParams
   {
-    enum { DEFAULT_N_LEVELS = 3, DEFAULT_FIRST_LEVEL = 0};
+    enum { DEFAULT_N_LEVELS = 3, DEFAULT_FIRST_LEVEL = 0, HARRIS_SCORE=0, FAST_SCORE=1 };
 
     /** default constructor */
-    CommonParams(float scale_factor = 1.2f, unsigned int n_levels = DEFAULT_N_LEVELS, int edge_threshold = 31,
-                 unsigned int first_level = DEFAULT_FIRST_LEVEL) :
+    CommonParams(float scale_factor = 1.2f, unsigned n_levels = DEFAULT_N_LEVELS, int edge_threshold = 31,
+                 unsigned first_level = DEFAULT_FIRST_LEVEL, int WTA_K=2, int score_type=HARRIS_SCORE) :
       scale_factor_(scale_factor), n_levels_(n_levels), first_level_(first_level >= n_levels ? 0 : first_level),
-      edge_threshold_(edge_threshold)
+      edge_threshold_(edge_threshold), WTA_K_(WTA_K), score_type_(score_type)
     {
-      // No other patch size is supported right now
-      patch_size_ = 31;
+        patch_size_ = 31;
     }
     void read(const FileNode& fn);
     void write(FileStorage& fs) const;
@@ -439,17 +438,21 @@ public:
     /** Coefficient by which we divide the dimensions from one scale pyramid level to the next */
     float scale_factor_;
     /** The number of levels in the scale pyramid */
-    unsigned int n_levels_;
+    unsigned n_levels_;
     /** The level at which the image is given
      * if 1, that means we will also look at the image scale_factor_ times bigger
      */
-    unsigned int first_level_;
-    /** How far from the boundary the points should be */
+    unsigned first_level_;
+    /** How far from the boundary the points should be. */
     int edge_threshold_;
+    
+    /** How many random points are used to produce each cell of the descriptor (2, 3, 4 ...) */
+    int WTA_K_;
+      
+    /** Type of the score to use (FAST, HARRIS, ...) */  
+    int score_type_; 
 
-    friend class ORB;
-  protected:
-    /** The size of the patch that will be used for orientation and comparisons */
+    /** The size of the patch that will be used for orientation and comparisons (only 31 is supported)*/
     int patch_size_;
   };
 
@@ -483,8 +486,12 @@ public:
   void
   operator()(const cv::Mat &image, const cv::Mat &mask, std::vector<cv::KeyPoint> & keypoints, cv::Mat & descriptors,
              bool useProvidedKeypoints = false);
-
+    
+  void read(const FileNode& fn);
+  void write(FileStorage& fs) const;
+    
 private:
+  
   /** The size of the patch used when comparing regions in the patterns */
   static const int kKernelWidth = 5;
 
@@ -515,7 +522,7 @@ private:
    * @param keypoints the resulting keypoints
    */
   void
-  computeOrientation(const cv::Mat& image, const cv::Mat& integral_image, unsigned int level,
+  computeOrientation(const cv::Mat& image, const cv::Mat& integral_image, unsigned level,
                      std::vector<cv::KeyPoint>& keypoints) const;
 
   /** Compute the ORB descriptors
@@ -526,7 +533,7 @@ private:
    * @param descriptors the resulting descriptors
    */
   void
-  computeDescriptors(const cv::Mat& image, const cv::Mat& integral_image, unsigned int level,
+  computeDescriptors(const cv::Mat& image, const cv::Mat& integral_image, unsigned level,
                      std::vector<cv::KeyPoint>& keypoints, cv::Mat & descriptors) const;
 
   /** Compute the integral image and upadte the cached values
@@ -534,33 +541,25 @@ private:
    * @param level the scale at which we compute the orientation
    * @param descriptors the resulting descriptors
    */
-  void computeIntegralImage(const cv::Mat & image, unsigned int level, cv::Mat &integral_image);
+  void computeIntegralImage(const cv::Mat & image, unsigned level, cv::Mat &integral_image);
 
   /** Parameters tuning ORB */
   CommonParams params_;
 
-  /** size of the half patch used for orientation computation, see Rosin - 1999 - Measuring Corner Properties */
-  int half_patch_size_;
-
-  /** pre-computed offsets used for the Harris verification, one vector per scale */
-  std::vector<std::vector<int> > orientation_horizontal_offsets_;
-  std::vector<std::vector<int> > orientation_vertical_offsets_;
-
   /** The steps of the integral images for each scale */
-  std::vector<size_t> integral_image_steps_;
+  vector<size_t> integral_image_steps_;
 
   /** The number of desired features per scale */
-  std::vector<size_t> n_features_per_level_;
+  vector<size_t> n_features_per_level_;
 
   /** The overall number of desired features */
   size_t n_features_;
-
-  /** the end of a row in a circular patch */
-  std::vector<int> u_max_;
-
-  /** The patterns for each level (the patterns are the same, but not their offset */
-  class OrbPatterns;
-  std::vector<OrbPatterns*> patterns_;
+    
+  /** The circular region to compute a feature orientation */
+  vector<int> u_max_;
+  
+  /** Points to compute BRIEF descriptors from */
+  vector<Point> pattern;
 };
 
 /*!
@@ -1378,7 +1377,7 @@ protected:
 /*
  * Abstract base class for 2D image feature detectors.
  */
-class CV_EXPORTS FeatureDetector
+class CV_EXPORTS_W FeatureDetector
 {
 public:
     virtual ~FeatureDetector();
@@ -1390,7 +1389,7 @@ public:
      * mask         Mask specifying where to look for keypoints (optional). Must be a char
      *              matrix with non-zero values in the region of interest.
      */
-    void detect( const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const;
+    CV_WRAP void detect( const Mat& image, CV_OUT vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const;
     
     /*
      * Detect keypoints in an image set.
@@ -1406,10 +1405,10 @@ public:
     virtual void write( FileStorage& ) const;
 
     // Return true if detector object is empty
-    virtual bool empty() const;
+    CV_WRAP virtual bool empty() const;
 
     // Create feature detector by detector name.
-    static Ptr<FeatureDetector> create( const string& detectorType );
+    CV_WRAP static Ptr<FeatureDetector> create( const string& detectorType );
 
 protected:
     virtual void detectImpl( const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const = 0;
@@ -1422,10 +1421,10 @@ protected:
     static void removeInvalidPoints( const Mat& mask, vector<KeyPoint>& keypoints );
 };
 
-class CV_EXPORTS FastFeatureDetector : public FeatureDetector
+class CV_EXPORTS_W FastFeatureDetector : public FeatureDetector
 {
 public:
-    FastFeatureDetector( int threshold=10, bool nonmaxSuppression=true );
+    CV_WRAP FastFeatureDetector( int threshold=10, bool nonmaxSuppression=true );
     virtual void read( const FileNode& fn );
     virtual void write( FileStorage& fs ) const;
 
@@ -1483,11 +1482,11 @@ protected:
     MSER mser;
 };
 
-class CV_EXPORTS StarFeatureDetector : public FeatureDetector
+class CV_EXPORTS_W StarFeatureDetector : public FeatureDetector
 {
 public:
     StarFeatureDetector( const CvStarDetectorParams& params=cvStarDetectorParams() );
-    StarFeatureDetector( int maxSize, int responseThreshold=30, int lineThresholdProjected = 10,
+    CV_WRAP StarFeatureDetector( int maxSize, int responseThreshold=30, int lineThresholdProjected = 10,
                          int lineThresholdBinarized=8, int suppressNonmaxSize=5 );
     virtual void read( const FileNode& fn );
     virtual void write( FileStorage& fs ) const;
@@ -1551,10 +1550,6 @@ protected:
 private:
   /** the ORB object we use for the computations */
   mutable ORB orb_;
-  /** The parameters used */
-  ORB::CommonParams params_;
-  /** the number of features that need to be retrieved */
-  unsigned int n_features_;
 };
 
 class CV_EXPORTS SimpleBlobDetector : public cv::FeatureDetector
@@ -1644,7 +1639,7 @@ protected:
  * Adapts a detector to partition the source image into a grid and detect
  * points in each cell.
  */
-class CV_EXPORTS GridAdaptedFeatureDetector : public FeatureDetector
+class CV_EXPORTS_W GridAdaptedFeatureDetector : public FeatureDetector
 {
 public:
     /*
@@ -1654,7 +1649,7 @@ public:
      * gridRows            Grid rows count.
      * gridCols            Grid column count.
      */
-    GridAdaptedFeatureDetector( const Ptr<FeatureDetector>& detector, int maxTotalKeypoints=1000,
+    CV_WRAP GridAdaptedFeatureDetector( const Ptr<FeatureDetector>& detector, int maxTotalKeypoints=1000,
                                 int gridRows=4, int gridCols=4 );
     
     // TODO implement read/write
@@ -1673,11 +1668,11 @@ protected:
  * Adapts a detector to detect points over multiple levels of a Gaussian
  * pyramid. Useful for detectors that are not inherently scaled.
  */
-class CV_EXPORTS PyramidAdaptedFeatureDetector : public FeatureDetector
+class CV_EXPORTS_W PyramidAdaptedFeatureDetector : public FeatureDetector
 {
 public:
     // maxLevel - The 0-based index of the last pyramid layer
-    PyramidAdaptedFeatureDetector( const Ptr<FeatureDetector>& detector, int maxLevel=2 );
+    CV_WRAP PyramidAdaptedFeatureDetector( const Ptr<FeatureDetector>& detector, int maxLevel=2 );
     
     // TODO implement read/write
     virtual bool empty() const;
@@ -1835,7 +1830,7 @@ CV_EXPORTS Mat windowedMatchingMask( const vector<KeyPoint>& keypoints1, const v
  * distances between descriptors. Therefore we represent a collection of
  * descriptors as a cv::Mat, where each row is one keypoint descriptor.
  */
-class CV_EXPORTS DescriptorExtractor
+class CV_EXPORTS_W DescriptorExtractor
 {
 public:
     virtual ~DescriptorExtractor();
@@ -1846,7 +1841,7 @@ public:
      * keypoints    The input keypoints. Keypoints for which a descriptor cannot be computed are removed.
      * descriptors  Copmputed descriptors. Row i is the descriptor for keypoint i.
      */
-    void compute( const Mat& image, vector<KeyPoint>& keypoints, Mat& descriptors ) const;
+    CV_WRAP void compute( const Mat& image, CV_OUT CV_IN_OUT vector<KeyPoint>& keypoints, CV_OUT Mat& descriptors ) const;
 
     /*
      * Compute the descriptors for a keypoints collection detected in image collection.
@@ -1860,12 +1855,12 @@ public:
     virtual void read( const FileNode& );
     virtual void write( FileStorage& ) const;
 
-    virtual int descriptorSize() const = 0;
-    virtual int descriptorType() const = 0;
+    CV_WRAP virtual int descriptorSize() const = 0;
+    CV_WRAP virtual int descriptorType() const = 0;
 
-    virtual bool empty() const;
+    CV_WRAP virtual bool empty() const;
 
-    static Ptr<DescriptorExtractor> create( const string& descriptorExtractorType );
+    CV_WRAP static Ptr<DescriptorExtractor> create( const string& descriptorExtractorType );
 
 protected:
     virtual void computeImpl( const Mat& image, vector<KeyPoint>& keypoints, Mat& descriptors ) const = 0;
@@ -1953,8 +1948,6 @@ protected:
 private:
   /** the ORB object we use for the computations */
   mutable ORB orb_;
-  /** The parameters used */
-  ORB::CommonParams params_;
 };
 
 /*
@@ -2104,13 +2097,7 @@ struct CV_EXPORTS SL2
 
     ResultType operator()( const T* a, const T* b, int size ) const
     {
-        ResultType result = ResultType();
-        for( int i = 0; i < size; i++ )
-        {
-            ResultType diff = (ResultType)(a[i] - b[i]);
-            result += diff*diff;
-        }
-        return result;
+        return normL2Sqr<ValueType, ResultType>(a, b, size);
     }
 };
 
@@ -2125,13 +2112,7 @@ struct CV_EXPORTS L2
 
     ResultType operator()( const T* a, const T* b, int size ) const
     {
-        ResultType result = ResultType();
-        for( int i = 0; i < size; i++ )
-        {
-            ResultType diff = (ResultType)(a[i] - b[i]);
-            result += diff*diff;
-        }
-        return (ResultType)sqrt((double)result);
+        return (ResultType)sqrt((double)normL2Sqr<ValueType, ResultType>(a, b, size));
     }
 };
 
@@ -2146,13 +2127,7 @@ struct CV_EXPORTS L1
 
     ResultType operator()( const T* a, const T* b, int size ) const
     {
-        ResultType result = ResultType();
-        for( int i = 0; i < size; i++ )
-        {
-            ResultType diff = a[i] - b[i];
-            result += (ResultType)fabs( diff );
-        }
-        return result;
+        return normL1<ValueType, ResultType>(a, b, size);
     }
 };
 
@@ -2160,60 +2135,51 @@ struct CV_EXPORTS L1
  * Hamming distance functor - counts the bit differences between two strings - useful for the Brief descriptor
  * bit count of A exclusive XOR'ed with B
  */
-struct CV_EXPORTS HammingLUT
+struct CV_EXPORTS Hamming
 {
     typedef unsigned char ValueType;
     typedef int ResultType;
 
     /** this will count the bits in a ^ b
      */
-    ResultType operator()( const unsigned char* a, const unsigned char* b, int size ) const;
-
-    /** \brief given a byte, count the bits using a compile time generated look up table
-     *  \param b the byte to count bits.  The look up table has an entry for all
-     *  values of b, where that entry is the number of bits.
-     *  \return the number of bits in byte b
-     */
-    static unsigned char byteBitsLookUp(unsigned char b);
+    ResultType operator()( const unsigned char* a, const unsigned char* b, int size ) const
+    {
+        return normHamming(a, b, size);
+    }
 };
 
+typedef Hamming HammingLUT;
 
-/// Hamming distance functor, this one will try to use gcc's __builtin_popcountl
-/// but will fall back on HammingLUT if not available
-/// bit count of A exclusive XOR'ed with B
-struct CV_EXPORTS Hamming
+template<int cellsize> struct CV_EXPORTS HammingMultilevel
 {
     typedef unsigned char ValueType;
-
-    //! important that this is signed as weird behavior happens
-    // in BruteForce if not
     typedef int ResultType;
-
-    /** this will count the bits in a ^ b, using __builtin_popcountl try compiling with sse4
-    */
-    ResultType operator()(const unsigned char* a, const unsigned char* b, int size) const;
+    
+    ResultType operator()( const unsigned char* a, const unsigned char* b, int size ) const
+    {
+        return normHamming(a, b, size, cellsize);
+    }
 };
-
-
+    
 /****************************************************************************************\
 *                                      DMatch                                            *
 \****************************************************************************************/
 /*
  * Struct for matching: query descriptor index, train descriptor index, train image index and distance between descriptors.
  */
-struct CV_EXPORTS DMatch
+struct CV_EXPORTS_W_SIMPLE DMatch
 {
-    DMatch() : queryIdx(-1), trainIdx(-1), imgIdx(-1), distance(std::numeric_limits<float>::max()) {}
-    DMatch( int _queryIdx, int _trainIdx, float _distance ) :
+    CV_WRAP DMatch() : queryIdx(-1), trainIdx(-1), imgIdx(-1), distance(std::numeric_limits<float>::max()) {}
+    CV_WRAP DMatch( int _queryIdx, int _trainIdx, float _distance ) :
             queryIdx(_queryIdx), trainIdx(_trainIdx), imgIdx(-1), distance(_distance) {}
-    DMatch( int _queryIdx, int _trainIdx, int _imgIdx, float _distance ) :
+    CV_WRAP DMatch( int _queryIdx, int _trainIdx, int _imgIdx, float _distance ) :
             queryIdx(_queryIdx), trainIdx(_trainIdx), imgIdx(_imgIdx), distance(_distance) {}
 
-    int queryIdx; // query descriptor index
-    int trainIdx; // train descriptor index
-    int imgIdx;   // train image index
+    CV_PROP_RW int queryIdx; // query descriptor index
+    CV_PROP_RW int trainIdx; // train descriptor index
+    CV_PROP_RW int imgIdx;   // train image index
 
-    float distance;
+    CV_PROP_RW float distance;
 
     // less is better
     bool operator<( const DMatch &m ) const
@@ -2228,7 +2194,7 @@ struct CV_EXPORTS DMatch
 /*
  * Abstract base class for matching two sets of descriptors.
  */
-class CV_EXPORTS DescriptorMatcher
+class CV_EXPORTS_W DescriptorMatcher
 {
 public:
     virtual ~DescriptorMatcher();
@@ -2237,24 +2203,24 @@ public:
      * Add descriptors to train descriptor collection.
      * descriptors      Descriptors to add. Each descriptors[i] is a descriptors set from one image.
      */
-    virtual void add( const vector<Mat>& descriptors );
+    CV_WRAP virtual void add( const vector<Mat>& descriptors );
     /*
      * Get train descriptors collection.
      */
-    const vector<Mat>& getTrainDescriptors() const;
+    CV_WRAP const vector<Mat>& getTrainDescriptors() const;
     /*
      * Clear train descriptors collection.
      */
-    virtual void clear();
+    CV_WRAP virtual void clear();
 
     /*
      * Return true if there are not train descriptors in collection.
      */
-    virtual bool empty() const;
+    CV_WRAP virtual bool empty() const;
     /*
      * Return true if the matcher supports mask in match methods.
      */
-    virtual bool isMaskSupported() const = 0;
+    CV_WRAP virtual bool isMaskSupported() const = 0;
 
     /*
      * Train matcher (e.g. train flann index).
@@ -2267,20 +2233,20 @@ public:
      * if it has not trained yet or if new descriptors have been added to the train
      * collection).
      */
-    virtual void train();
+    CV_WRAP virtual void train();
     /*
      * Group of methods to match descriptors from image pair.
      * Method train() is run in this methods.
      */
     // Find one best match for each query descriptor (if mask is empty).
-    void match( const Mat& queryDescriptors, const Mat& trainDescriptors,
-                vector<DMatch>& matches, const Mat& mask=Mat() ) const;
+    CV_WRAP void match( const Mat& queryDescriptors, const Mat& trainDescriptors,
+                CV_OUT vector<DMatch>& matches, const Mat& mask=Mat() ) const;
     // Find k best matches for each query descriptor (in increasing order of distances).
     // compactResult is used when mask is not empty. If compactResult is false matches
     // vector will have the same size as queryDescriptors rows. If compactResult is true
     // matches vector will not contain matches for fully masked out query descriptors.
-    void knnMatch( const Mat& queryDescriptors, const Mat& trainDescriptors,
-                   vector<vector<DMatch> >& matches, int k,
+    CV_WRAP void knnMatch( const Mat& queryDescriptors, const Mat& trainDescriptors,
+                   CV_OUT vector<vector<DMatch> >& matches, int k,
                    const Mat& mask=Mat(), bool compactResult=false ) const;
     // Find best matches for each query descriptor which have distance less than
     // maxDistance (in increasing order of distances).
@@ -2291,9 +2257,9 @@ public:
      * Group of methods to match descriptors from one image to image set.
      * See description of similar methods for matching image pair above.
      */
-    void match( const Mat& queryDescriptors, vector<DMatch>& matches,
+    CV_WRAP void match( const Mat& queryDescriptors, CV_OUT vector<DMatch>& matches,
                 const vector<Mat>& masks=vector<Mat>() );
-    void knnMatch( const Mat& queryDescriptors, vector<vector<DMatch> >& matches, int k,
+    CV_WRAP void knnMatch( const Mat& queryDescriptors, CV_OUT vector<vector<DMatch> >& matches, int k,
            const vector<Mat>& masks=vector<Mat>(), bool compactResult=false );
     void radiusMatch( const Mat& queryDescriptors, vector<vector<DMatch> >& matches, float maxDistance,
                    const vector<Mat>& masks=vector<Mat>(), bool compactResult=false );
@@ -2308,7 +2274,7 @@ public:
     // but with empty train data.
     virtual Ptr<DescriptorMatcher> clone( bool emptyTrainData=false ) const = 0;
 
-    static Ptr<DescriptorMatcher> create( const string& descriptorMatcherType );
+    CV_WRAP static Ptr<DescriptorMatcher> create( const string& descriptorMatcherType );
 protected:
     /*
      * Class to work with descriptors from several images as with one merged matrix.
@@ -2562,10 +2528,10 @@ void BruteForceMatcher<L2<float> >::radiusMatchImpl( const Mat& queryDescriptors
 /*
  * Flann based matcher
  */
-class CV_EXPORTS FlannBasedMatcher : public DescriptorMatcher
+class CV_EXPORTS_W FlannBasedMatcher : public DescriptorMatcher
 {
 public:
-    FlannBasedMatcher( const Ptr<flann::IndexParams>& indexParams=new flann::KDTreeIndexParams(),
+    CV_WRAP FlannBasedMatcher( const Ptr<flann::IndexParams>& indexParams=new flann::KDTreeIndexParams(),
                        const Ptr<flann::SearchParams>& searchParams=new flann::SearchParams() );
 
     virtual void add( const vector<Mat>& descriptors );

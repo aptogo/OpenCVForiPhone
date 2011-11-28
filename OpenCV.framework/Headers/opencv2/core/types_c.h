@@ -250,14 +250,18 @@ enum {
  CV_StsBadMemBlock=            -214, /* an allocated block has been corrupted */
  CV_StsAssert=                 -215, /* assertion failed */    
  CV_GpuNotSupported=           -216,  
- CV_GpuApiCallError=           -217, 
- CV_GpuNppCallError=           -218,
- CV_GpuCufftCallError=         -219
+ CV_GpuApiCallError=           -217,
+ CV_OpenGlNotSupported=        -218,
+ CV_OpenGlApiCallError=        -219
 };
 
 /****************************************************************************************\
 *                             Common macros and inline functions                         *
 \****************************************************************************************/
+
+#ifdef HAVE_TEGRA_OPTIMIZATION
+# include "tegra_round.hpp"
+#endif
 
 #define CV_PI   3.1415926535897932384626433832795
 #define CV_LOG2 0.69314718055994530941723212145818
@@ -300,7 +304,11 @@ CV_INLINE  int  cvRound( double value )
     }
     return t;
 #elif defined HAVE_LRINT || defined CV_ICC || defined __GNUC__
+# ifdef HAVE_TEGRA_OPTIMIZATION
+    TEGRA_ROUND(value);
+# else
     return (int)lrint(value);
+# endif
 #else
     // while this is not IEEE754-compliant rounding, it's usually a good enough approximation
     return (int)(value + (value >= 0 ? 0.5 : -0.5));

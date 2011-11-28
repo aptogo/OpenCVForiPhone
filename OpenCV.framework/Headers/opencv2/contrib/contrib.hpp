@@ -605,6 +605,24 @@ namespace cv
     };
     
     CV_EXPORTS void polyfit(const Mat& srcx, const Mat& srcy, Mat& dst, int order);
+
+	class CV_EXPORTS Directory
+    {
+	    public:
+			static std::vector<std::string> GetListFiles  ( const std::string& path, const std::string & exten = "*", bool addPath = true );
+			static std::vector<std::string> GetListFilesR ( const std::string& path, const std::string & exten = "*", bool addPath = true );
+			static std::vector<std::string> GetListFolders( const std::string& path, const std::string & exten = "*", bool addPath = true );
+    };
+
+    /*
+     * Generation of a set of different colors by the following way:
+     * 1) generate more then need colors (in "factor" times) in RGB,
+     * 2) convert them to Lab,
+     * 3) choose the needed count of colors from the set that are more different from
+     *    each other,
+     * 4) convert the colors back to RGB
+     */
+    CV_EXPORTS void generateColors( std::vector<Scalar>& colors, size_t count, size_t factor=100 );
 }
 
 #include <OpenCV/opencv2/contrib/retina.hpp>
