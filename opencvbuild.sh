@@ -97,11 +97,12 @@ cmake -GXcode \
 	-DCMAKE_TOOLCHAIN_FILE="$SRC_DIR/ios/cmake/Toolchains/Toolchain-iPhoneDevice_Xcode.cmake" \
 	-DCMAKE_INSTALL_PREFIX="$IPHONE_OS_INSTALL_DIR" \
 	-DCMAKE_BUILD_TYPE=$CONFIGURATION \
-	-DCMAKE_C_FLAGS_RELEASE="-O3" \
-	-DCMAKE_CXX_FLAGS_RELEASE="-O3" \
+	-DCMAKE_C_FLAGS_RELEASE="-O3 -mno-thumb" \
+	-DCMAKE_CXX_FLAGS_RELEASE="-O3 -mno-thumb" \
 	-DWITH_CUDA=NO \
 	-DBUILD_PERF_TESTS=OFF \
 	-DBUILD_NEW_PYTHON_SUPPORT=OFF \
+	-DCMAKE_OSX_ARCHITECTURES="armv6 armv7" \
 	"$SRC_DIR" > /dev/null
 
 xcodebuild -sdk iphoneos -configuration $CONFIGURATION -target install
