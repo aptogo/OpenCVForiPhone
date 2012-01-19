@@ -106,12 +106,12 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
                                         false,                                          // Should interpolate
                                         kCGRenderingIntentDefault);                     // Intent   
     
-    UIImage *uiImage = [[UIImage alloc]initWithCGImage:imageRef];
+    self = [self initWithCGImage:imageRef];
     CGImageRelease(imageRef);
     CGDataProviderRelease(provider);
     CGColorSpaceRelease(colorSpace);
     
-    return uiImage;
+    return self;
 }
 
 
