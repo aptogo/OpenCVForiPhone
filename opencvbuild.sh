@@ -88,7 +88,7 @@ cmake -GXcode \
 	-DBUILD_NEW_PYTHON_SUPPORT=OFF \
 	"$SRC_DIR" > /dev/null
 
-xcodebuild -sdk iphonesimulator -configuration $CONFIGURATION -target install
+xcodebuild -sdk iphonesimulator -configuration $CONFIGURATION -target install install
 
 ################################################################################
 # Build for device
@@ -105,7 +105,7 @@ cmake -GXcode \
 	-DCMAKE_OSX_ARCHITECTURES="armv6 armv7" \
 	"$SRC_DIR" > /dev/null
 
-xcodebuild -sdk iphoneos -configuration $CONFIGURATION -target install
+xcodebuild -sdk iphoneos -configuration $CONFIGURATION -target install install
 
 ################################################################################
 # Create universal installation package
