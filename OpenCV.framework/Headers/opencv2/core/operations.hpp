@@ -48,6 +48,7 @@
   #include <limits.h>
 #endif // SKIP_INCLUDES
 
+
 #ifdef __cplusplus
 
 /////// exchange-add operation for atomic operations on reference counters ///////
@@ -820,7 +821,7 @@ Matx<_Tp, n, m> Matx<_Tp, m, n>::inv(int method) const
     else
     {
         Mat A(*this, false), B(b, false);
-        ok = (0.0 == invert(A, B, method));
+        ok = (invert(A, B, method) != 0);
     }
     return ok ? b : Matx<_Tp, n, m>::zeros();
 }
@@ -903,12 +904,14 @@ template<typename _Tp, typename _AccTp> static inline
 _AccTp normL2Sqr(const _Tp* a, int n)
 {
     _AccTp s = 0;
-    int i;
-    for( i = 0; i <= n - 4; i += 4 )
+    int i=0;
+ #if CV_ENABLE_UNROLLED
+    for( ; i <= n - 4; i += 4 )
     {
         _AccTp v0 = a[i], v1 = a[i+1], v2 = a[i+2], v3 = a[i+3];
         s += v0*v0 + v1*v1 + v2*v2 + v3*v3;
     }
+#endif
     for( ; i < n; i++ )
     {
         _AccTp v = a[i];
@@ -922,12 +925,14 @@ template<typename _Tp, typename _AccTp> static inline
 _AccTp normL1(const _Tp* a, int n)
 {
     _AccTp s = 0;
-    int i;
-    for( i = 0; i <= n - 4; i += 4 )
+    int i = 0;
+#if CV_ENABLE_UNROLLED
+    for(; i <= n - 4; i += 4 )
     {
         s += (_AccTp)fast_abs(a[i]) + (_AccTp)fast_abs(a[i+1]) +
             (_AccTp)fast_abs(a[i+2]) + (_AccTp)fast_abs(a[i+3]);
     }
+#endif
     for( ; i < n; i++ )
         s += fast_abs(a[i]);
     return s;
@@ -948,12 +953,14 @@ template<typename _Tp, typename _AccTp> static inline
 _AccTp normL2Sqr(const _Tp* a, const _Tp* b, int n)
 {
     _AccTp s = 0;
-    int i;
-    for( i = 0; i <= n - 4; i += 4 )
+    int i= 0;
+ #if CV_ENABLE_UNROLLED
+    for(; i <= n - 4; i += 4 )
     {
         _AccTp v0 = a[i] - b[i], v1 = a[i+1] - b[i+1], v2 = a[i+2] - b[i+2], v3 = a[i+3] - b[i+3];
         s += v0*v0 + v1*v1 + v2*v2 + v3*v3;
     }
+#endif
     for( ; i < n; i++ )
     {
         _AccTp v = a[i] - b[i];
@@ -986,12 +993,14 @@ template<typename _Tp, typename _AccTp> static inline
 _AccTp normL1(const _Tp* a, const _Tp* b, int n)
 {
     _AccTp s = 0;
-    int i;
-    for( i = 0; i <= n - 4; i += 4 )
+    int i= 0;
+ #if CV_ENABLE_UNROLLED
+    for(; i <= n - 4; i += 4 )
     {
         _AccTp v0 = a[i] - b[i], v1 = a[i+1] - b[i+1], v2 = a[i+2] - b[i+2], v3 = a[i+3] - b[i+3];
         s += std::abs(v0) + std::abs(v1) + std::abs(v2) + std::abs(v3);
     }
+#endif
     for( ; i < n; i++ )
     {
         _AccTp v = a[i] - b[i];
@@ -2422,14 +2431,16 @@ template<typename _Tp> inline typename DataType<_Tp>::work_type
 dot(const Vector<_Tp>& v1, const Vector<_Tp>& v2)
 {
     typedef typename DataType<_Tp>::work_type _Tw;
-    size_t i, n = v1.size();
+    size_t i = 0, n = v1.size();
     assert(v1.size() == v2.size());
 
     _Tw s = 0;
     const _Tp *ptr1 = &v1[0], *ptr2 = &v2[0];
-    for( i = 0; i <= n - 4; i += 4 )
+ #if CV_ENABLE_UNROLLED
+    for(; i <= n - 4; i += 4 )
         s += (_Tw)ptr1[i]*ptr2[i] + (_Tw)ptr1[i+1]*ptr2[i+1] +
             (_Tw)ptr1[i+2]*ptr2[i+2] + (_Tw)ptr1[i+3]*ptr2[i+3];
+#endif
     for( ; i < n; i++ )
         s += (_Tw)ptr1[i]*ptr2[i];
     return s;
@@ -2601,6 +2612,30 @@ template<typename _Tp> inline Ptr<_Tp>::operator const _Tp*() const { return obj
 
 template<typename _Tp> inline bool Ptr<_Tp>::empty() const { return obj == 0; }
 
+template<typename _Tp> template<typename _Tp2> inline Ptr<_Tp2> Ptr<_Tp>::ptr()
+{
+    Ptr<_Tp2> p;
+    if( !obj )
+        return p;
+    if( refcount )
+        CV_XADD(refcount, 1);
+    p.obj = dynamic_cast<_Tp2*>(obj);
+    p.refcount = refcount;
+    return p;
+}
+    
+template<typename _Tp> template<typename _Tp2> inline const Ptr<_Tp2> Ptr<_Tp>::ptr() const
+{
+    Ptr<_Tp2> p;
+    if( !obj )
+        return p;
+    if( refcount )
+        CV_XADD(refcount, 1);
+    p.obj = dynamic_cast<_Tp2*>(obj);
+    p.refcount = refcount;
+    return p;
+}
+    
 //// specializied implementations of Ptr::delete_obj() for classic OpenCV types
 
 template<> CV_EXPORTS void Ptr<CvMat>::delete_obj();
@@ -3766,50 +3801,49 @@ template<typename _Tp> static inline std::ostream& operator << (std::ostream& ou
     return out;
 }
     
-/*template<typename _Tp> struct AlgorithmParamType {};
-template<> struct AlgorithmParamType<int> { enum { type = CV_PARAM_TYPE_INT }; };
-template<> struct AlgorithmParamType<double> { enum { type = CV_PARAM_TYPE_REAL }; };
-template<> struct AlgorithmParamType<string> { enum { type = CV_PARAM_TYPE_STRING }; };
-template<> struct AlgorithmParamType<Mat> { enum { type = CV_PARAM_TYPE_MAT }; };
-    
-template<typename _Tp> _Tp Algorithm::get(int paramId) const
+
+template<typename _Tp> inline Ptr<_Tp> Algorithm::create(const string& name)
 {
-    _Tp value = _Tp();
-    get_(paramId, AlgorithmParamType<_Tp>::type, &value);
-    return value;
+    return _create(name).ptr<_Tp>();
 }
     
-template<typename _Tp> bool Algorithm::set(int paramId, const _Tp& value)
+template<typename _Tp> inline typename ParamType<_Tp>::member_type Algorithm::get(const string& name) const
 {
-    set_(paramId, AlgorithmParamType<_Tp>::type, &value);
+    typename ParamType<_Tp>::member_type value;
+    info()->get(this, name.c_str(), ParamType<_Tp>::type, &value);
     return value;
-}
-    
-template<typename _Tp> _Tp Algorithm::paramDefaultValue(int paramId) const
-{
-    _Tp value = _Tp();
-    paramDefaultValue_(paramId, AlgorithmParamType<_Tp>::type, &value);
-    return value;
-}
-    
-template<typename _Tp> bool Algorithm::paramRange(int paramId, _Tp& minVal, _Tp& maxVal) const
-{
-    return paramRange_(paramId, AlgorithmParamType<_Tp>::type, &minVal, &maxVal);
 }
 
-template<typename _Tp> void Algorithm::addParam(int propId, _Tp& value, bool readOnly, const string& name,
-                                         const string& help, const _Tp& defaultValue,
-                                         _Tp (Algorithm::*getter)(), bool (Algorithm::*setter)(const _Tp&))
+template<typename _Tp> inline typename ParamType<_Tp>::member_type Algorithm::get(const char* name) const
 {
-    addParam_(propId, AlgorithmParamType<_Tp>::type, &value, readOnly, name, help, &defaultValue,
-             (void*)getter, (void*)setter);
+    typename ParamType<_Tp>::member_type value;
+    info()->get(this, name, ParamType<_Tp>::type, &value);
+    return value;
+}    
+    
+template<typename _Tp> inline void Algorithm::set(const string& name,
+                                                  typename ParamType<_Tp>::const_param_type value)
+{
+    info()->set(this, name.c_str(), ParamType<_Tp>::type, &value);
 }
-    
-template<typename _Tp> void Algorithm::setParamRange(int propId, const _Tp& minVal, const _Tp& maxVal)
+
+template<typename _Tp> inline void Algorithm::set(const char* name,
+                                                  typename ParamType<_Tp>::const_param_type value)
 {
-    setParamRange_(propId, AlgorithmParamType<_Tp>::type, &minVal, &maxVal);
-}*/
-    
+    info()->set(this, name, ParamType<_Tp>::type, &value);
+}
+
+template<typename _Tp> inline void AlgorithmInfo::addParam(const Algorithm* algo, const char* name,
+                                                    const typename ParamType<_Tp>::member_type& value,
+                                                    bool readOnly, 
+                                                    typename ParamType<_Tp>::member_type (Algorithm::*getter)(),
+                                                    void (Algorithm::*setter)(typename ParamType<_Tp>::const_param_type),
+                                                    const string& help)
+{
+    addParam_(algo, name, ParamType<_Tp>::type, &value, readOnly,
+              (Algorithm::Getter)getter, (Algorithm::Setter)setter, help);
+}
+
 }
 
 #endif // __cplusplus

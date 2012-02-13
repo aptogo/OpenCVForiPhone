@@ -131,6 +131,12 @@ CV_INLINE IppiSize ippiSize(int width, int height)
 #define CPU_HAS_NEON_FEATURE (false)
 #endif
 
+#ifdef CV_ICC
+#define CV_ENABLE_UNROLLED 0
+#else
+#define CV_ENABLE_UNROLLED 1
+#endif
+
 #ifndef IPPI_CALL
 #define IPPI_CALL(func) CV_Assert((func) >= 0)
 #endif
@@ -198,19 +204,6 @@ CV_INLINE IppiSize ippiSize(int width, int height)
             int _begin, _end, _grainsize;
         };
 
-
-#ifdef HAVE_THREADING_FRAMEWORK 
-#include <OpenCV/opencv2/core/threading_framework.hpp>
-
-        template<typename Body> 
-        static void parallel_for( const BlockedRange& range, const Body& body )
-        {
-            tf::parallel_for<Body>(range, body);
-        }
-        
-        typedef tf::ConcurrentVector<Rect> ConcurrentRectVector;
-        typedef tf::ConcurrentVector<double> ConcurrentDoubleVector;
-#else
         template<typename Body> static inline
         void parallel_for( const BlockedRange& range, const Body& body )
         {
@@ -218,7 +211,6 @@ CV_INLINE IppiSize ippiSize(int width, int height)
         }
         typedef std::vector<Rect> ConcurrentRectVector;
         typedef std::vector<double> ConcurrentDoubleVector;
-#endif
         
         template<typename Iterator, typename Body> static inline
         void parallel_do( Iterator first, Iterator last, const Body& body )
@@ -707,5 +699,37 @@ CvBigFuncTable;
     (tab).fn_2d[CV_32S] = (void*)FUNCNAME##_32s##FLAG;  \
     (tab).fn_2d[CV_32F] = (void*)FUNCNAME##_32f##FLAG;  \
     (tab).fn_2d[CV_64F] = (void*)FUNCNAME##_64f##FLAG
+
+//! OpenGL extension table
+class CV_EXPORTS CvOpenGlFuncTab
+{
+public:
+    virtual ~CvOpenGlFuncTab();
+
+    virtual void genBuffers(int n, unsigned int* buffers) const = 0;        
+    virtual void deleteBuffers(int n, const unsigned int* buffers) const = 0;
+
+    virtual void bufferData(unsigned int target, ptrdiff_t size, const void* data, unsigned int usage) const = 0;
+    virtual void bufferSubData(unsigned int target, ptrdiff_t offset, ptrdiff_t size, const void* data) const = 0;
+
+    virtual void bindBuffer(unsigned int target, unsigned int buffer) const = 0;
+
+    virtual void* mapBuffer(unsigned int target, unsigned int access) const = 0;
+    virtual void unmapBuffer(unsigned int target) const = 0;
+
+    virtual void generateBitmapFont(const std::string& family, int height, int weight, bool italic, bool underline, int start, int count, int base) const = 0;
+
+    virtual bool isGlContextInitialized() const = 0;
+};
+
+CV_EXPORTS void icvSetOpenGlFuncTab(const CvOpenGlFuncTab* tab);
+
+CV_EXPORTS bool icvCheckGlError(const char* file, const int line, const char* func = "");
+
+#if defined(__GNUC__)
+    #define CV_CheckGlError() CV_DbgAssert( (::icvCheckGlError(__FILE__, __LINE__, __func__)) )
+#else
+    #define CV_CheckGlError() CV_DbgAssert( (::icvCheckGlError(__FILE__, __LINE__)) )
+#endif
 
 #endif
