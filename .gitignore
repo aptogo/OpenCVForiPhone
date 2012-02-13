@@ -3,3 +3,5 @@ OpenCV_iPhoneOS
 OpenCV_iPhoneSimulator
 tmp
 opencv
+project.xcworkspace
+xcuserdata

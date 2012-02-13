@@ -347,6 +347,11 @@ CV_EXPORTS Ptr<FilterEngine> createBoxFilter( int srcType, int dstType, Size ksi
                                               Point anchor=Point(-1,-1),
                                               bool normalize=true,
                                               int borderType=BORDER_DEFAULT);
+    
+//! returns the Gabor kernel with the specified parameters
+CV_EXPORTS_W Mat getGaborKernel( Size ksize, double sigma, double theta, double lambd,
+                                 double gamma, double psi=CV_PI*0.5, int ktype=CV_64F );
+    
 //! type of morphological operation
 enum { MORPH_ERODE=CV_MOP_ERODE, MORPH_DILATE=CV_MOP_DILATE,
        MORPH_OPEN=CV_MOP_OPEN, MORPH_CLOSE=CV_MOP_CLOSE,
@@ -694,6 +699,14 @@ CV_EXPORTS_W void calcBackProject( InputArrayOfArrays images, const vector<int>&
                                    const vector<float>& ranges,
                                    double scale );
 
+/*CV_EXPORTS void calcBackProjectPatch( const Mat* images, int nimages, const int* channels,
+                                      InputArray hist, OutputArray dst, Size patchSize,
+                                      int method, double factor=1 );    
+    
+CV_EXPORTS_W void calcBackProjectPatch( InputArrayOfArrays images, const vector<int>& channels,
+                                        InputArray hist, OutputArray dst, Size patchSize,
+                                        int method, double factor=1 );*/
+
 //! compares two histograms stored in dense arrays
 CV_EXPORTS_W double compareHist( InputArray H1, InputArray H2, int method );
 
@@ -750,12 +763,12 @@ CV_EXPORTS_W void inpaint( InputArray src, InputArray inpaintMask,
                            OutputArray dst, double inpaintRange, int flags );
 
 //! builds the discrete Voronoi diagram
-CV_EXPORTS_W void distanceTransform( InputArray src, OutputArray dst,
+CV_EXPORTS_AS(distanceTransformWithLabels) void distanceTransform( InputArray src, OutputArray dst,
                                      OutputArray labels, int distanceType, int maskSize );
 
 //! computes the distance transform map
-CV_EXPORTS void distanceTransform( InputArray src, OutputArray dst,
-                                   int distanceType, int maskSize );
+CV_EXPORTS_W void distanceTransform( InputArray src, OutputArray dst,
+                                     int distanceType, int maskSize );
 
 enum { FLOODFILL_FIXED_RANGE = 1 << 16, FLOODFILL_MASK_ONLY = 1 << 17 };
 
@@ -910,12 +923,22 @@ enum
     COLOR_YUV420i2BGR  = 91,
     COLOR_YUV420sp2RGB = 92,
     COLOR_YUV420sp2BGR = 93,
-    
+
+    COLOR_YUV2RGB_NV12 = COLOR_YUV420i2RGB,
+    COLOR_YUV2BGR_NV12 = COLOR_YUV420i2BGR,
+    COLOR_YUV2RGB_NV21 = COLOR_YUV420sp2RGB,
+    COLOR_YUV2BGR_NV21 = COLOR_YUV420sp2BGR,
+
     COLOR_YUV420i2RGBA  = 94,
     COLOR_YUV420i2BGRA  = 95,
     COLOR_YUV420sp2RGBA = 96,
     COLOR_YUV420sp2BGRA = 97,
 
+    COLOR_YUV2RGBA_NV12 = COLOR_YUV420i2RGBA,
+    COLOR_YUV2BGRA_NV12 = COLOR_YUV420i2BGRA,
+    COLOR_YUV2RGBA_NV21 = COLOR_YUV420sp2RGBA,
+    COLOR_YUV2BGRA_NV21 = COLOR_YUV420sp2BGRA,
+    
     COLOR_COLORCVT_MAX  =100
 };
     

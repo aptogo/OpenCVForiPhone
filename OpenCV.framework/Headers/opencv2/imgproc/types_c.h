@@ -44,7 +44,6 @@
 #define __OPENCV_IMGPROC_TYPES_C_H__
 
 #include <OpenCV/opencv2/core/core_c.h>
-#include <OpenCV/opencv2/imgproc/types_c.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -231,10 +230,20 @@ enum
     CV_YUV420sp2RGB = 92,
     CV_YUV420sp2BGR = 93,
 
+    CV_YUV2RGB_NV12 = CV_YUV420i2RGB,
+    CV_YUV2BGR_NV12 = CV_YUV420i2BGR,
+    CV_YUV2RGB_NV21 = CV_YUV420sp2RGB,
+    CV_YUV2BGR_NV21 = CV_YUV420sp2BGR,
+
     CV_YUV420i2RGBA  = 94,
     CV_YUV420i2BGRA  = 95,
     CV_YUV420sp2RGBA = 96,
     CV_YUV420sp2BGRA = 97,
+
+    CV_YUV2RGBA_NV12 = CV_YUV420i2RGBA,
+    CV_YUV2BGRA_NV12 = CV_YUV420i2BGRA,
+    CV_YUV2RGBA_NV21 = CV_YUV420sp2RGBA,
+    CV_YUV2BGRA_NV21 = CV_YUV420sp2BGRA,
     
     CV_COLORCVT_MAX  =100
 };

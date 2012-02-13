@@ -166,6 +166,16 @@ public:
 	virtual ~Retina();
 
 	/**
+        * retreive retina input buffer size 
+        */
+        Size inputSize();
+
+	/**
+        * retreive retina output buffer size 
+        */
+        Size outputSize();
+
+	/**
 	 * try to open an XML retina parameters file to adjust current retina instance setup
 	 * => if the xml file does not exist, then default setup is applied
 	 * => warning, Exceptions are thrown if read XML file is not valid
@@ -278,6 +288,10 @@ public:
 	 */
 	void getMagno(std::valarray<float> &retinaOutput_magno);
 
+	// original API level data accessors : get buffers addresses...
+	const std::valarray<float> & getMagno() const;
+	const std::valarray<float> & getParvo() const;
+
 	/**
 	 * activate color saturation as the final step of the color demultiplexing process
 	 * -> this saturation is a sigmoide function applied to each channel of the demultiplexed image.
@@ -329,7 +343,7 @@ protected:
 	 * @param outputValarrayMatrix : the output valarray
 	 * @return the input image color mode (color=true, gray levels=false)
 	 */
-	const bool _convertCvMat2ValarrayBuffer(const cv::Mat inputMatToConvert, std::valarray<float> &outputValarrayMatrix);
+        bool _convertCvMat2ValarrayBuffer(const cv::Mat inputMatToConvert, std::valarray<float> &outputValarrayMatrix);
 
 	//! private method called by constructors, gathers their parameters and use them in a unified way
 	void _init(const Size inputSize, const bool colorMode, RETINA_COLORSAMPLINGMETHOD colorSamplingMethod=RETINA_COLOR_BAYER, const bool useRetinaLogSampling=false, const double reductionFactor=1.0, const double samplingStrenght=10.0);

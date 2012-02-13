@@ -63,8 +63,7 @@ enum {  CV_FONT_LIGHT           = 25,//QFont::Light,
 
 enum {  CV_STYLE_NORMAL         = 0,//QFont::StyleNormal,
         CV_STYLE_ITALIC         = 1,//QFont::StyleItalic,
-        CV_STYLE_OBLIQUE        = 2,//QFont::StyleOblique
-        CV_STYLE_UNDERLINE      = 4
+        CV_STYLE_OBLIQUE        = 2 //QFont::StyleOblique
 };
 /* ---------*/
 
@@ -252,17 +251,12 @@ CVAPI(int) cvWaitKey(int delay CV_DEFAULT(0));
 
 // OpenGL support
 
-typedef void (CV_CDECL *CvOpenGLCallback)(void* userdata);
-CVAPI(void) cvCreateOpenGLCallback( const char* window_name, CvOpenGLCallback callbackOpenGL, void* userdata CV_DEFAULT(NULL), double angle CV_DEFAULT(-1), double zmin CV_DEFAULT(-1), double zmax CV_DEFAULT(-1));
+typedef void (CV_CDECL *CvOpenGlDrawCallback)(void* userdata);
+CVAPI(void) cvSetOpenGlDrawCallback(const char* window_name, CvOpenGlDrawCallback callback, void* userdata CV_DEFAULT(NULL));
 
 CVAPI(void) cvSetOpenGlContext(const char* window_name);
 CVAPI(void) cvUpdateWindow(const char* window_name);
 
-CVAPI(void) cvAddTextOpenGl(const char* winname, const char* text, CvPoint org, CvScalar color CV_DEFAULT(cvScalar(255.0, 255.0, 255.0, 255.0)), 
-                            const char* fontName CV_DEFAULT("Courier New"), int fontHeight CV_DEFAULT(12), 
-                            int fontWeight CV_DEFAULT(CV_FONT_NORMAL), int fontStyle CV_DEFAULT(CV_STYLE_NORMAL));
-
-CVAPI(void) cvClearTextOpenGl(const char* winname);
 
 /****************************************************************************************\
 *                         Working with Video Files and Cameras                           *
