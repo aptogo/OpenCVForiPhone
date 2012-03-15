@@ -33,11 +33,6 @@ fi
 CONFIGURATION=Release
 FRAMEWORK_NAME=OpenCV
 
-# List of all OpenCV libraries
-OPENCV_LIBRARIES=(libopencv_core.a libopencv_calib3d.a libopencv_contrib.a libopencv_features2d.a \
-					libopencv_flann.a libopencv_highgui.a libopencv_imgproc.a libopencv_legacy.a \
-					libopencv_ml.a libopencv_objdetect.a libopencv_video.a)
-
 # Absolute path to the source code directory.
 D=`dirname "$1"`
 B=`basename "$1"`
@@ -63,75 +58,76 @@ echo "Build directory   :" $BUILD_DIR
 
 ################################################################################
 # Clean previous build
-rm -rf "$TEMP_BUILD_DIR"
-rm -rf "$IPHONE_SIMULATOR_INSTALL_DIR"
-rm -rf "$IPHONE_OS_INSTALL_DIR"
-rm -rf "$UNIVERSAL_INSTALL_DIR"
-rm -rf "$FRAMEWORK_DIR"
+rm -rf $TEMP_BUILD_DIR
+rm -rf $IPHONE_SIMULATOR_INSTALL_DIR
+rm -rf $IPHONE_OS_INSTALL_DIR
+rm -rf $UNIVERSAL_INSTALL_DIR
+rm -rf $FRAMEWORK_DIR
 
-mkdir -p "$BUILD_DIR"
-mkdir -p "$TEMP_BUILD_DIR"
+mkdir -p $BUILD_DIR
+mkdir -p $TEMP_BUILD_DIR
 # Build is performed in TEMP_BUILD_DIR
-cd "$TEMP_BUILD_DIR"
+cd $TEMP_BUILD_DIR
 
 ################################################################################
 # Build for simulator
 echo "Building for iphone simulator"
 cmake -GXcode \
-	-DCMAKE_TOOLCHAIN_FILE="$SRC_DIR/ios/cmake/Toolchains/Toolchain-iPhoneSimulator_Xcode.cmake" \
-	-DCMAKE_INSTALL_PREFIX="$IPHONE_SIMULATOR_INSTALL_DIR" \
-	-DCMAKE_BUILD_TYPE=$CONFIGURATION \
-	-DCMAKE_C_FLAGS_RELEASE="-O3" \
-	-DCMAKE_CXX_FLAGS_RELEASE="-O3" \
-	-DWITH_CUDA=NO \
-	-DBUILD_PERF_TESTS=OFF \
-	-DBUILD_NEW_PYTHON_SUPPORT=OFF \
-	"$SRC_DIR" > /dev/null
+	  -DCMAKE_TOOLCHAIN_FILE=$SRC_DIR/ios/cmake/Toolchains/Toolchain-iPhoneSimulator_Xcode.cmake \
+	  -DCMAKE_INSTALL_PREFIX=$IPHONE_SIMULATOR_INSTALL_DIR \
+	  -DOPENCV_BUILD_3RDPARTY_LIBS=YES \
+	  -DCMAKE_XCODE_ATTRIBUTE_GCC_VERSION="com.apple.compilers.llvmgcc42" \
+      $SRC_DIR
 
 xcodebuild -sdk iphonesimulator -configuration $CONFIGURATION -target install
+
+################################################################################
+# Copy third party and opencv libs:
+cp -f $TEMP_BUILD_DIR/3rdparty/lib/$CONFIGURATION/*.a $IPHONE_SIMULATOR_INSTALL_DIR/lib/
+cp -f $TEMP_BUILD_DIR/lib/$CONFIGURATION/*.a $IPHONE_SIMULATOR_INSTALL_DIR/lib/
 
 ################################################################################
 # Build for device
 echo "Building for iphone device"
 cmake -GXcode \
-	-DCMAKE_TOOLCHAIN_FILE="$SRC_DIR/ios/cmake/Toolchains/Toolchain-iPhoneDevice_Xcode.cmake" \
-	-DCMAKE_INSTALL_PREFIX="$IPHONE_OS_INSTALL_DIR" \
-	-DCMAKE_BUILD_TYPE=$CONFIGURATION \
-	-DCMAKE_C_FLAGS_RELEASE="-O3 -mno-thumb" \
-	-DCMAKE_CXX_FLAGS_RELEASE="-O3 -mno-thumb" \
-	-DWITH_CUDA=NO \
-	-DBUILD_PERF_TESTS=OFF \
-	-DBUILD_NEW_PYTHON_SUPPORT=OFF \
-	-DCMAKE_OSX_ARCHITECTURES="armv6 armv7" \
-	"$SRC_DIR" > /dev/null
+	  -DCMAKE_TOOLCHAIN_FILE=$SRC_DIR/ios/cmake/Toolchains/Toolchain-iPhoneDevice_Xcode.cmake \
+	  -DCMAKE_INSTALL_PREFIX=$IPHONE_OS_INSTALL_DIR \
+	  -DOPENCV_BUILD_3RDPARTY_LIBS=YES \
+      -DCMAKE_XCODE_ATTRIBUTE_GCC_VERSION="com.apple.compilers.llvmgcc42" \
+      $SRC_DIR
 
 xcodebuild -sdk iphoneos -configuration $CONFIGURATION -target install
 
 ################################################################################
-# Create universal installation package
-mkdir -p "$UNIVERSAL_INSTALL_DIR"
-mkdir -p "$UNIVERSAL_INSTALL_DIR/lib"
+# Copy third party and opencv libs:
+cp -f $TEMP_BUILD_DIR/3rdparty/lib/$CONFIGURATION/*.a  $IPHONE_OS_INSTALL_DIR/lib/
+cp -f $TEMP_BUILD_DIR/lib/$CONFIGURATION/*.a $IPHONE_OS_INSTALL_DIR/lib/
 
-cp -R "$IPHONE_SIMULATOR_INSTALL_DIR/include" "$UNIVERSAL_INSTALL_DIR/include"
-cp -R "$IPHONE_SIMULATOR_INSTALL_DIR/share" "$UNIVERSAL_INSTALL_DIR/share"
+################################################################################
+# Create universal installation package
+mkdir -p $UNIVERSAL_INSTALL_DIR
+mkdir -p $UNIVERSAL_INSTALL_DIR/lib
+
+cp -R $IPHONE_SIMULATOR_INSTALL_DIR/include $UNIVERSAL_INSTALL_DIR/include
+cp -R $IPHONE_SIMULATOR_INSTALL_DIR/share $UNIVERSAL_INSTALL_DIR/share
 
 # Create fat binaries for OpenCV libraries
-for FILE in ${OPENCV_LIBRARIES[@]}
+for FILE in `ls $IPHONE_OS_INSTALL_DIR/lib/ | grep .a`
 do
-	lipo  "$IPHONE_OS_INSTALL_DIR/lib/$FILE" \
-	     "$IPHONE_SIMULATOR_INSTALL_DIR/lib/$FILE" \
-	     -create -output "$UNIVERSAL_INSTALL_DIR/lib/$FILE"
+    lipo $IPHONE_OS_INSTALL_DIR/lib/$FILE \
+	     $IPHONE_SIMULATOR_INSTALL_DIR/lib/$FILE \
+	     -create -output $UNIVERSAL_INSTALL_DIR/lib/$FILE
 done
 
 ################################################################################
 # Create iOS framework
-mkdir -p "$FRAMEWORK_DIR"
+mkdir -p $FRAMEWORK_DIR
 
 # Combine all libraries into one - required for framework
-libtool -o "$FRAMEWORK_DIR/$FRAMEWORK_NAME" $UNIVERSAL_INSTALL_DIR/lib/*.a 2> /dev/null
+libtool -o $FRAMEWORK_DIR/$FRAMEWORK_NAME $UNIVERSAL_INSTALL_DIR/lib/*.a 2> /dev/null
 
 # Copy public headers into framework
-cp -R "$UNIVERSAL_INSTALL_DIR/include" "$FRAMEWORK_DIR/Headers"
+cp -R $UNIVERSAL_INSTALL_DIR/include $FRAMEWORK_DIR/Headers
 
 # Fix-up header files to use standard framework-style include paths
 for FILE in `find "$FRAMEWORK_DIR/Headers" -type f`

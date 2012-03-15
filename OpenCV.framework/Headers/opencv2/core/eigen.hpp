@@ -45,7 +45,8 @@
 
 #ifdef __cplusplus
 
-#include "cxcore.h"
+#include <OpenCV/opencv2/core/core_c.h>
+#include <OpenCV/opencv2/core/core.hpp>
 
 namespace cv
 {
