@@ -151,7 +151,7 @@ const int kCannyAperture = 7;
     cv::Mat grayFrame, output;
   
     // Convert captured frame to grayscale
-    cv::cvtColor(_lastFrame, grayFrame, cv::COLOR_RGB2GRAY);
+    cv::cvtColor(_lastFrame, grayFrame, cv::COLOR_BGR2GRAY);
     
     // Perform Canny edge detection using slide values for thresholds
     cv::Canny(grayFrame, output,
